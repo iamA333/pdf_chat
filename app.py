@@ -11,7 +11,7 @@ from langchain.chains import ConversationChain
 from langchain.chains.question_answering import load_qa_chain
 from langchain.chains import ConversationChain
 import os
-from transformers import pipeline
+# from transformers import pipeline
 
 #Background
 def set_background():
