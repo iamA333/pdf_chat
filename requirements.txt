@@ -5,3 +5,4 @@ streamlit==1.24.1
 faiss-cpu==1.7.4
 streamlit-extras
 sentence-transformers
+ctransformers
