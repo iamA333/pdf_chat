@@ -1,23 +1,17 @@
 import streamlit as st
 import pickle 
 from streamlit_extras.add_vertical_space import add_vertical_space
-# import numpy as np
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from dotenv import load_dotenv
-# from langchain.llms import vertexai
-# VertexAIEmbeddings
-# from google.cloud import aiplatform
-# from langchain.llms import VertexAI
-# import google.generativeai
-# from langchain.embeddings import GooglePalmEmbeddings
-# from langchain import HuggingFaceHub
-# from langchain.llms import google_palm
+from langchain.llms import CTransformers
+from langchain.chains import ConversationChain
 from langchain.chains.question_answering import load_qa_chain
+from langchain.chains import ConversationChain
 import os
-
+from transformers import pipeline
 
 #Background
 def set_background():
@@ -58,40 +52,44 @@ def main():
         text=""
         for page in pdf_reader.pages:
             text+=page.extract_text()
-        # st.write(text)
+
         text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200, length_function=len)
         chunks=text_splitter.split_text(text=text)
-        # st.write(chunks)
+    
 
         #EMBEDDINGS
 
         storename=pdf.name[:-4]
+        # add LLama
         if os.path.exists(f"{storename}.pkl"):
             with open(f"{storename}.pkl",'rb') as f:
                 Vectorstore=pickle.load(f)
 
         else:
             embeddings = HuggingFaceEmbeddings()
-            # embeddings = GooglePalmEmbeddings()
+           
             Vectorstore=FAISS.from_texts(chunks,embedding=embeddings)
             with open(f"{storename}.pkl",'wb') as f:
                 pickle.dump(Vectorstore,f)
-            # st.write(embeddings)
-        query=st.text_input("Enter question")
-        # st.write(query)
+         
+        query=st.text_input("Ask a question")
+       
         if query:
-            docs=Vectorstore.similarity_search(query=query,k=3) 
-            st.write(docs)
-        # google_api_key=os.getenv('GOOGLE_API_KEY')
-        # llm=HuggingFaceHub(repo_id="google/flan-t5-xl", model_kwargs={"temperature":1e-10})
-        # chain=load_qa_chain(llm=llm,chain_type="stuff")
-        # response= chain.run(input_documents=docs, question= query)
-        # st.write(response)
+            # if (query==1):
+            # summarizer = pipeline("summarization", model="Azma-AI/bart-large-text-summarizer")
+            # st.write(summarizer(text))
+                
+         
+            docs=Vectorstore.similarity_search(query=query,k=3)
+            llm = CTransformers(model="marella/gpt-2-ggml")
+            chain=load_qa_chain(llm=llm,chain_type="stuff")          
 
-        # llm = google_palm(google_api_key=google_api_key)
-        # llm.temperature = 0.1
-        # llm =ctransformers(model="marella/gpt-2-ggml")
-        # llm=vertexai()
+
+            response= chain.run(input_documents=docs, question= query)
+            st.write(response) 
+
+
+
     
 if __name__ == "__main__":
     main()
