@@ -7,3 +7,5 @@ PDF Upload: Users can upload their PDF documents through the web interface.
 Summarization: The application processes the uploaded PDF and generates a concise summary of the document's content.
 
 Question Answering: The application processes the uploaded PDF and answers questions based on it
+
+![UI](https://github.com/iamA333/pdf_summarizer/assets/67963799/ff2db88a-8598-40fd-b647-99762a19f2ad)
